@@ -1,59 +1,69 @@
-# Note: Modularisation du serveur et lodash
+# Note : Modularisation du serveur et lodash
 
-- Il est important pour rendre le code serveur plus propre, maintenable et modulaire :
-  - Découper ton code en modules : schémas GraphQL, résolveurs, utilitaires, etc.
-  - Manipuler beaucoup de données, objets, tableaux.
+La modularisation du serveur est essentielle pour rendre le code plus propre, maintenable et modulaire. Cela implique notamment :
 
-Lodash aide ici à :
+- Découper le code en modules distincts : schémas GraphQL, résolveurs, utilitaires, etc.
+- Manipuler efficacement de nombreuses données, objets, tableaux.
+
+**Lodash** est une bibliothèque utile dans ce contexte car elle permet de :
 
 - Gérer facilement les objets et tableaux dans chaque module.
-- Faciliter la copie, fusion, filtrage ou transformation des données.
-- Rendre ton code plus lisible et moins verbeux.
+- Faciliter la copie, la fusion, le filtrage ou la transformation des données.
+- Rendre le code plus lisible et moins verbeux.
 
-```
+```bash
 npm i lodash
-```
+````
 
-# type `EquipmentAdv`
+---
 
-- `EquipmentAdv` = **"Equipment Advanced"**
-- Contient des champs enrichis ou transformés par rapport à `Equipment`
-- Utilisé pour exposer des données calculées ou dérivées dans l'API GraphQL
+# Type `EquipmentAdv`
+
+* **`EquipmentAdv`** signifie **"Equipment Advanced"**.
+* Ce type contient des champs enrichis ou transformés par rapport à `Equipment`.
+* Il est utilisé pour exposer des données calculées ou dérivées dans l'API GraphQL.
 
 ## Champs notables
 
-- `id: ID!` — identifiant unique, obligatoire
-- `used_by: String!` — utilisateur de l'équipement, obligatoire
-- `count: Int!` — quantité, obligatoire
-- `use_rate: Float` — taux d'utilisation (optionnel, calculé si `used_by === "developer"`)
-- `is_new: Boolean!` — vrai si `new_or_used === "new"` (dérivé, obligatoire)
+| Champ      | Type       | Description                                                          |
+| ---------- | ---------- | -------------------------------------------------------------------- |
+| `id`       | `ID!`      | Identifiant unique, obligatoire                                      |
+| `used_by`  | `String!`  | Utilisateur de l'équipement, obligatoire                             |
+| `count`    | `Int!`     | Quantité, obligatoire                                                |
+| `use_rate` | `Float`    | Taux d'utilisation (optionnel, calculé si `used_by === "developer"`) |
+| `is_new`   | `Boolean!` | Vrai si `new_or_used === "new"` (dérivé, obligatoire)                |
 
 ## Remarques
 
-- Le point d’exclamation `(!)` signifie que le champ est **non null**.
-- Ce type permet de séparer la **logique métier enrichie** du modèle brut `Equipment`.
+* Le point d’exclamation `!` indique que le champ est **non null**.
+* Ce type permet de séparer la **logique métier enrichie** du modèle brut `Equipment`.
 
-## But | Détail |
+## Objectifs détaillés
 
-| ---------------------------------- | ------------------------------------------------------------ |
-| **Afficher des données enrichies** | Calculs dérivés (`is_new`), valeurs ajoutées (`use_rate`) |
-| **Type fort et obligatoire** | Les champs ont des types plus stricts que dans `Equipment` |
-| **Eviter d’altérer la source** | Permet de transformer les données sans toucher aux originaux |
-| **Meilleure clarté côté client** | Un schéma plus explicite pour les consommateurs de l'API |
+| But                            | Détail                                                    |
+| ------------------------------ | --------------------------------------------------------- |
+| Afficher des données enrichies | Calculs dérivés (`is_new`), valeurs ajoutées (`use_rate`) |
+| Type fort et obligatoire       | Champs aux types stricts comparé à `Equipment`            |
+| Éviter d’altérer la source     | Transformer les données sans modifier les originaux       |
+| Meilleure clarté côté client   | Schéma plus explicite pour les consommateurs de l'API     |
 
-## Comparaison
+## Comparaison des types
 
-| Type           | Signifie                | Données                            |
-| -------------- | ----------------------- | ---------------------------------- |
-| `Equipment`    | Données brutes (DB)     | `new_or_used = "new"`              |
-| `EquipmentAdv` | Données enrichies (API) | `is_new = true`, `use_rate = 0.75` |
+| Type           | Signification            | Données exemple                    |
+| -------------- | ------------------------ | ---------------------------------- |
+| `Equipment`    | Données brutes (base DB) | `new_or_used = "new"`              |
+| `EquipmentAdv` | Données enrichies (API)  | `is_new = true`, `use_rate = 0.75` |
 
-# \_enums.js
+---
 
-- définir des types énumérés (enums) dans ton schéma GraphQL.
+# `_enums.js`
+
+Ce fichier sert à définir des **types énumérés** (enums) dans ton schéma GraphQL.
 
 ## À quoi servent ces enums dans GraphQL ?
 
-Limiter les valeurs possibles d’un champ à un ensemble prédéfini.
-Garantir la validité des données côté API en forçant l’utilisation de ces valeurs.
-Améliorer la clarté du schéma en documentant explicitement les options disponibles.
+* Limiter les valeurs possibles d’un champ à un ensemble prédéfini.
+* Garantir la validité des données côté API en forçant l’utilisation de ces valeurs.
+* Améliorer la clarté du schéma en documentant explicitement les options disponibles.
+
+```
