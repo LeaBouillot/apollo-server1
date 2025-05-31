@@ -67,3 +67,311 @@ Ce fichier sert à définir des **types énumérés** (enums) dans ton schéma G
 * Améliorer la clarté du schéma en documentant explicitement les options disponibles.
 
 ```
+
+# Union et Interface
+
+### Union
+
+L’union est utilisée lorsqu’on souhaite retourner plusieurs types dans un même tableau.
+
+**Exemple :** retourner à la fois `Equipment` et `Supply`.
+
+- `givens.js`
+```
+const { gql } = require('apollo-server')
+const dbWorks = require('../dbWorks.js')
+const typeDefs = gql`
+    union Given = Equipment | Supply
+`
+const resolvers = {
+    Query: {
+        givens: (parent, args) => {
+            return [
+                ...dbWorks.getEquipments(args),
+                ...dbWorks.getSupplies(args)
+            ]
+        }
+    },
+    Given: {
+        __resolveType(given, context, info) {
+            if (given.used_by) {
+                return 'Equipment'
+            }
+            if (given.team) {
+                return 'Supply'
+            }
+            return null
+        }
+    }
+}
+module.exports = {
+    typeDefs: typeDefs,
+    resolvers: resolvers
+}
+```
+
+- `_queries.js`
+```
+const typeDefs = gql`
+    type Query {
+        // ...
+        givens: [Given]
+    }
+`
+```
+
+- `index.js`
+```
+// ...
+const givens = require('./typedefs-resolvers/givens')
+// ...
+const typeDefs = [
+    // ...
+    givens.typeDefs
+]
+// ...
+const resolvers = [
+    // ...
+    givens.resolvers
+]
+// ...
+```
+### Query
+```
+query {
+  givens {
+    __typename
+    ... on Equipment {
+      id
+      used_by
+      count
+      new_or_used
+    }
+    ... on Supply {
+      id
+      team
+    }
+  }
+}
+```
+
+---
+### Interface
+
+Une interface définit un type abstrait avec des champs communs pour plusieurs types similaires.  
+Elle sert à créer des types qui seront **implémentés** par d’autres types.
+
+**Champs communs :** `id`, `used_by`
+
+- `tools.js`
+- `equipments.js`  
+- `equipments.js`
+- `index.js`
+
+---
+
+### Application à la requête People
+
+- `people.js`
+- `_queries.js`
+- `index.js`
+
+### Query
+```
+query {
+  people {
+    id
+    first_name
+    last_name
+    givens {
+        __typename
+    	... on Equipment {
+      	id
+      	used_by
+      	count
+      	new_or_used
+    	}
+    	... on Supply {
+      	id
+      	team
+    	}
+  	}
+    tools {
+      __typename
+      ... on Equipment {
+        id
+        used_by
+        count
+        new_or_used
+      }
+      ... on Software {
+        id
+        used_by
+        description
+        developed_by
+      }
+    }
+  }
+}
+```
+# Arguments et types input
+
+Filtrer et récupérer les données People selon certaines conditions
+
+- `_queries.js`
+```
+    type Query {
+        ...
+        peopleFiltered(
+            team: Int, 
+            sex: Sex, 
+            blood_type: BloodType, 
+            from: String
+        ): [People]
+        ...
+    }
+```
+
+- `people.js`
+```
+  Query: {
+    // ...
+    peopleFiltered: (parent, args) => dbWorks.getPeople(args),
+  }
+```
+- Query:
+```
+query {
+  peopleFiltered (
+    team: 1
+    blood_type: B
+    from: "Texas"
+  ) {
+    id
+    first_name
+    last_name
+    sex
+    blood_type
+    serve_years
+    role
+    team
+    from
+  }
+}
+```
+---
+
+## Pagination des résultats
+
+- `_queries.js`
+```
+    type Query {
+        ...
+        peoplePaginated(
+            page: Int!,
+            per_page: Int!
+        ): [People]
+        ...
+    }
+```    
+- `people.js`
+```
+    Query: {
+        // ...
+        peoplePaginated: (parent, args) => dbWorks.getPeople(args),
+        // ...
+    }
+```
+- Query:
+```
+query {
+	peoplePaginated(page: 1, per_page: 7) {
+    id
+    first_name
+    last_name
+    sex
+    blood_type
+    serve_years
+    role
+    team
+    from
+  }
+}
+```    
+
+---
+
+## Utilisation d’alias (badGuys, newYorker...)
+```
+query {
+  badGuys: peopleFiltered(sex: male, blood_type: B) {
+    first_name
+    last_name
+    sex
+    blood_type
+  }
+  newYorkers: peopleFiltered(from: "New York") {
+    first_name
+    last_name
+    from
+  }
+}
+```
+
+---
+
+## Types input
+
+- `people.js`
+```
+const typeDefs = gql`
+    ....
+    input PostPersonInput {
+        first_name: String!
+        last_name: String!
+        sex: Sex!
+        blood_type: BloodType!
+        serve_years: Int!
+        role: Role!
+        team: ID!
+        from: String!
+    }
+`
+const resolvers = {
+    // ...
+    Mutation: {
+        postPerson: (parent, args) => dbWorks.postPerson(args),
+    }
+}
+```
+- `_mutation.js`
+```
+type Mutation {
+    postPerson(input: PostPersonInput): People!
+    ...
+}
+```
+- Mutation:
+```
+mutation {
+  postPerson(input: {
+    first_name: "Hanna"
+    last_name: "Kim"
+    sex: female
+    blood_type: O
+    serve_years: 3
+    role: developer
+    team: 1
+    from: "Pusan"
+  }) {
+    id
+    first_name
+    last_name
+    sex
+    blood_type
+    role
+    team
+    from
+  }
+}
+```
