@@ -1,15 +1,14 @@
-# Apollo Server1
+# Apollo Server & GraphQL
 
 ## Création du projet
 
 1. Ouvre un terminal, puis tape :
 
 ```bash
-cd Dev
 mkdir apollo-server1
 cd apollo-server1
 code .
-````
+```
 
 2. Initialise le projet npm :
 
@@ -22,7 +21,7 @@ Appuie sur **Entrée** pour accepter les valeurs par défaut et générer le fic
 3. Crée un fichier `index.js` avec ce contenu simple pour tester :
 
 ```js
-console.log('Projet commence');
+console.log("Projet commence");
 ```
 
 4. Lance le fichier pour vérifier :
@@ -37,21 +36,21 @@ Tu devrais voir s’afficher : `Projet commence`
 
 ## Utilisation de nodemon pour le rechargement automatique
 
-* Si `nodemon` n’est pas installé, installe-le globalement :
+- Si `nodemon` n’est pas installé, installe-le globalement :
 
 ```bash
 npm install -g nodemon
 ```
 
-* Lance ton serveur en mode surveillance (rechargement automatique) :
+- Lance ton serveur en mode surveillance (rechargement automatique) :
 
 ```bash
 nodemon index.js
 ```
 
-* Pour arrêter le serveur, utilise `Cmd + C`.
+- Pour arrêter le serveur, utilise `Cmd + C`.
 
-* Alternativement, ajoute ce script dans le `package.json` pour lancer nodemon via npm :
+- Alternativement, ajoute ce script dans le `package.json` pour lancer nodemon via npm :
 
 ```json
 "scripts": {
@@ -59,7 +58,7 @@ nodemon index.js
 }
 ```
 
-* Puis lance avec :
+- Puis lance avec :
 
 ```bash
 npm start
@@ -69,27 +68,27 @@ npm start
 
 ## Ajout d’une base de données mock (fausse base de données)
 
-* Copie le contenu du dossier `2-1-graphql-api-setup` dans ton projet, notamment :
+- Copie le contenu du dossier `2-1-graphql-api-setup` dans ton projet, notamment :
 
-  * Le fichier `database.js`
-  * Le dossier `data-in-csv`
+  - Le fichier `database.js`
+  - Le dossier `data-in-csv`
 
-* Dans `index.js`, importe la base de données et affiche-la pour test :
+- Dans `index.js`, importe la base de données et affiche-la pour test :
 
 ```js
-const database = require('./database');
+const database = require("./database");
 console.log(database);
 ```
 
-* Optionnel : installe l’extension **Edit csv** dans VS Code pour éditer facilement les fichiers CSV.
+- Optionnel : installe l’extension **Edit csv** dans VS Code pour éditer facilement les fichiers CSV.
 
-* Installe la librairie pour convertir CSV en JSON :
+- Installe la librairie pour convertir CSV en JSON :
 
 ```bash
 npm i convert-csv-to-json
 ```
 
-* Relance ton serveur :
+- Relance ton serveur :
 
 ```bash
 npm start
@@ -110,8 +109,8 @@ npm i graphql apollo-server
 Dans `index.js`, remplace le contenu par :
 
 ```js
-const database = require('./database');
-const { ApolloServer, gql } = require('apollo-server');
+const database = require("./database");
+const { ApolloServer, gql } = require("apollo-server");
 
 const typeDefs = gql`
   type Query {
@@ -131,8 +130,8 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    teams: () => database.teams
-  }
+    teams: () => database.teams,
+  },
 };
 
 const server = new ApolloServer({ typeDefs, resolvers });
