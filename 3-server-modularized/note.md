@@ -66,7 +66,6 @@ Ce fichier sert à définir des **types énumérés** (enums) dans ton schéma G
 * Garantir la validité des données côté API en forçant l’utilisation de ces valeurs.
 * Améliorer la clarté du schéma en documentant explicitement les options disponibles.
 
-```
 
 # Union et Interface
 
