@@ -1,6 +1,3 @@
-Voici un README.md en français basé sur ton contenu, bien organisé et clair :
-
-````markdown
 # Apollo Server1
 
 ## Création du projet
